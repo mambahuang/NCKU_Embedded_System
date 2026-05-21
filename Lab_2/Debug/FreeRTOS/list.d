@@ -1,0 +1,17 @@
+FreeRTOS/list.o: ../FreeRTOS/list.c \
+ C:/Users/angel/STM32CubeIDE/workspace_1.17.0/Lab_2/FreeRTOS/include/FreeRTOS.h \
+ C:/Users/angel/STM32CubeIDE/workspace_1.17.0/Lab_2/FreeRTOS/include/FreeRTOSConfig.h \
+ C:/Users/angel/STM32CubeIDE/workspace_1.17.0/Lab_2/FreeRTOS/include/projdefs.h \
+ C:/Users/angel/STM32CubeIDE/workspace_1.17.0/Lab_2/FreeRTOS/include/portable.h \
+ C:/Users/angel/STM32CubeIDE/workspace_1.17.0/Lab_2/FreeRTOS/include/deprecated_definitions.h \
+ C:/Users/angel/STM32CubeIDE/workspace_1.17.0/Lab_2/FreeRTOS/portable/ARM_CM4F/portmacro.h \
+ C:/Users/angel/STM32CubeIDE/workspace_1.17.0/Lab_2/FreeRTOS/include/mpu_wrappers.h \
+ C:/Users/angel/STM32CubeIDE/workspace_1.17.0/Lab_2/FreeRTOS/include/list.h
+C:/Users/angel/STM32CubeIDE/workspace_1.17.0/Lab_2/FreeRTOS/include/FreeRTOS.h:
+C:/Users/angel/STM32CubeIDE/workspace_1.17.0/Lab_2/FreeRTOS/include/FreeRTOSConfig.h:
+C:/Users/angel/STM32CubeIDE/workspace_1.17.0/Lab_2/FreeRTOS/include/projdefs.h:
+C:/Users/angel/STM32CubeIDE/workspace_1.17.0/Lab_2/FreeRTOS/include/portable.h:
+C:/Users/angel/STM32CubeIDE/workspace_1.17.0/Lab_2/FreeRTOS/include/deprecated_definitions.h:
+C:/Users/angel/STM32CubeIDE/workspace_1.17.0/Lab_2/FreeRTOS/portable/ARM_CM4F/portmacro.h:
+C:/Users/angel/STM32CubeIDE/workspace_1.17.0/Lab_2/FreeRTOS/include/mpu_wrappers.h:
+C:/Users/angel/STM32CubeIDE/workspace_1.17.0/Lab_2/FreeRTOS/include/list.h:
