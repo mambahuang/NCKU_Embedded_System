@@ -22,7 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -51,16 +51,18 @@ UART_HandleTypeDef huart2;
 /* USER CODE BEGIN PV */
 #define PDM_BUFFER_SIZE 128  // 64 * 2 (Ping-Pong)
 #define PCM_BUFFER_SIZE 32   // 16 * 2 (Ping-Pong)
-#define RECORD_LENGTH 16000  // 1 秒鐘的錄音 (16kHz)
+#define RECORD_LENGTH 32000  // 2 seconds recording (16kHz)
 
 uint16_t PDM_Rx_Buffer[PDM_BUFFER_SIZE];
 int16_t PCM_Out_Buffer[PCM_BUFFER_SIZE];
-int16_t Record_Buffer[RECORD_LENGTH];
+//int16_t Record_Buffer[RECORD_LENGTH];
+int16_t pcm_input_2s[RECORD_LENGTH];
 uint32_t record_index = 0;
-uint8_t is_recording = 1;    // 錄音開關
+//uint8_t is_recording = 1;    // 錄音開關
 
 volatile uint8_t pcm_data_ready = 0;
-volatile uint8_t pcm_half_or_full = 0; // 0 代表前半部準備好，1 代表後半部準備好
+volatile uint8_t pcm_half_or_full = 0; // 0: First half ready, 1: Second half ready
+volatile uint8_t dsp_run_flag = 0; // Flag to notify main loop: 2 seconds of data is ready, run DSP
 
 extern I2S_HandleTypeDef hi2s2;
 extern PDM_Filter_Handler_t PDM1_filter_handler;
@@ -124,29 +126,63 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	if (pcm_data_ready == 1){
-	  pcm_data_ready = 0;
-
-	  if (is_recording == 1)
+//	if (pcm_data_ready == 1){
+//	  pcm_data_ready = 0;
+//
+//	  if (is_recording == 1)
+//	  {
+//		// 判斷是前半部還是後半部準備好了
+//		uint32_t offset = (pcm_half_or_full == 0) ? 0 : (PCM_BUFFER_SIZE / 2);
+//
+//		// 將 16 個 PCM 數據複製到大陣列中
+//		for (int i = 0; i < (PCM_BUFFER_SIZE / 2); i++)
+//		{
+//		  if (record_index < RECORD_LENGTH)
+//		  {
+//			Record_Buffer[record_index++] = (int16_t)PCM_Out_Buffer[offset + i];
+//		  }
+//		  else
+//		  {
+//			is_recording = 0; // 錄滿 1 秒，停止錄音
+//			break;            // 可以在這行設定中斷點！
+//		  }
+//		}
+//	  }
+//	}
+	  // --- Phase 1：Collect audio data from hardware DMA ---
+	  if (pcm_data_ready == 1)
 	  {
-		// 判斷是前半部還是後半部準備好了
+		pcm_data_ready = 0;
 		uint32_t offset = (pcm_half_or_full == 0) ? 0 : (PCM_BUFFER_SIZE / 2);
 
-		// 將 16 個 PCM 數據複製到大陣列中
 		for (int i = 0; i < (PCM_BUFFER_SIZE / 2); i++)
 		{
-		  if (record_index < RECORD_LENGTH)
+		  pcm_input_2s[record_index++] = (int16_t)PCM_Out_Buffer[offset + i];
+
+		  // When 2 seconds (32000 samples) of data is collected
+		  if (record_index >= RECORD_LENGTH)
 		  {
-			Record_Buffer[record_index++] = (int16_t)PCM_Out_Buffer[offset + i];
-		  }
-		  else
-		  {
-			is_recording = 0; // 錄滿 1 秒，停止錄音
-			break;            // 可以在這行設定中斷點！
+			dsp_run_flag = 1; // Set flag to trigger DSP execution below
+
+			// [Core Sliding Window Operation]
+			// Move the recent 1 second (16000 ~ 31999) to the first half (0 ~ 15999)
+			memcpy(&pcm_input_2s[0], &pcm_input_2s[16000], 16000 * sizeof(int16_t));
+
+			// Reset index to the midpoint so new audio overwrites from 16000
+			record_index = 16000;
 		  }
 		}
 	  }
-	}
+
+	  // --- Phase 2：Run DSP & MFCC Extraction and Model Inference ---
+	  if (dsp_run_flag == 1)
+	  {
+		dsp_run_flag = 0;
+
+		// Call your DSP function(?
+		// Eg:
+		// teammate_dsp_function(pcm_input_2s);
+	  }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
